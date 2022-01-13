@@ -5,18 +5,16 @@ const userController = {
   // GET all users
   getAllUsers(req, res) {
     User.find({})
-      .select("-__v")
       .then((dbUserData) => res.json(dbUserData))
       .catch((err) => {
         console.log(err);
-        res.status(400).json(err);
+        res.status(500).json(err);
       });
   },
 
   // GET a single user by its _id
   getUserById({ params }, res) {
     User.findOne({ _id: params.Userid })
-      .select("-__v")
       //populated thought and friend data
       .populate("friends")
       .populate("thoughts")
@@ -24,23 +22,23 @@ const userController = {
         // If no user is found, send 404
         if (!dbUserData) {
           res.status(404).json({ message: "No user found with this id!" });
-          return;
         }
-        res.json(dbUserData);
+        res.json(dbThoughtData);
       })
       .catch((err) => {
         console.log(err);
-        res.status(400).json(err);
+        res.status(500).json(err);
       });
   },
 
   // POST a new user
   createUser({ body }, res) {
-    // // example data
-    // {
-    //   "username": "lernantino",
-    //   "email": "lernantino@gmail.com"
-    // }
+  // example data
+// {
+//   "thoughtText": "Here's a cool thought...",
+//   "username": "lernantino",
+//   "userId": "5edff358a0fcb779aa7b118b"
+// }
     User.create(body)
       .then((dbUserData) => res.json(dbUserData))
       .catch((err) => res.status(400).json(err));
@@ -59,7 +57,7 @@ const userController = {
         }
         res.json(dbUserData);
       })
-      .catch((err) => res.status(400).json(err));
+      .catch((err) => res.status(500).json(err));
   },
 
   // DELETE to remove user by its _id
@@ -72,7 +70,7 @@ const userController = {
         }
         res.json(dbUserData);
       })
-      .catch(err => res.status(400).json(err));
+      .catch(err => res.status(500).json(err));
   }
 
   // BONUS: Remove a user's associated thoughts when deleted.
