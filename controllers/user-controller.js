@@ -49,6 +49,27 @@ const userController = {
       return;
   },
 
+  // POST to add a new friend to a user's friend list
+  addFriend({ params, name }, res) {
+    User.findOneAndUpdate(
+      { _id: params.userId },
+      { $addToSet: { friends: name } },
+      { new: true }
+    )
+      .then((dbUserData) => {
+        if (!dbUserData) {
+          res.status(404).json({ message: "No user with this id!" });
+          // stop further execution in this callback
+          return;
+        }
+        res.json(dbUserData);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json(err);
+      });
+  },
+
   // PUT to update a user by its _id
   updateUser({ params, body }, res) {
     User.findOneAndUpdate({ _id: params.userId }, body, {
@@ -85,14 +106,14 @@ const userController = {
 
   // POST to add a new friend to a user's friend list
   addFriend({ params }, res) {
-    User.findOneAndUpdate({ _id: params.userId }, { $addToSet: { friends: params.friendId } }, { new: true })
+    User.findOneAndUpdate({ _id: params.userId }, { $addToSet: { friends: params.friendId} }, { new: true })
       .then((dbUserData) => {
-        res.json(dbUserData)
         if (!dbUserData) {
           res.status(404).json({ message: 'No user with this id!' });
           // stop further execution in this callback
           return;
         }
+        res.json(dbUserData)
       })
       .catch((err) => {
         console.log(err);
